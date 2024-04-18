@@ -16,8 +16,14 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::select(["id", "type_id", "name_project", "description", "img"])
-        ->orderBy("id", "DESC")
-        ->with(["type:id,label,color", "technologies:id,name,color_label"])->paginate(12);
+        ->with(["type:id,label,color", "technologies:id,name,color_label"])
+        ->orderBy("id", "ASC")
+        ->paginate(12);
+
+        foreach ($projects as $project) {
+            $project->img = !empty($project->img) ? asset("/storage/" . $project->img) : null;
+        }
+
         return response()->json($projects);
     }
 
