@@ -15,14 +15,15 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::select(["id", "type_id", "name_project", "description", "img"])
+        $projects = Project::select(["id", "type_id", "name_project", "description", "img", "slug"])
         ->with(["type:id,label,color", "technologies:id,name,color_label"])
         ->orderBy("id", "ASC")
         ->paginate(12);
 
         foreach ($projects as $project) {
             $project->img = !empty($project->img) ? asset("/storage/" . $project->img) : null;
-        }
+            /* $project->description = $project->getAbstract(45); */
+        };
 
         return response()->json($projects);
     }
@@ -33,8 +34,15 @@ class ProjectController extends Controller
      * @param  int  $id
 
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $project = Project::select(["id", "type_id", "name_project", "description", "img", "slug"])
+        ->where("slug", $slug)
+        ->with(["type:id,label,color", "technologies:id,name,color_label"])
+        ->first();
+        $project->img = !empty($project->img) ? asset("/storage/" . $project->img) : null;
+        /* $project->description = $project->getAbstract(45); */
+
+        return response()->json($project);
     }
 }
